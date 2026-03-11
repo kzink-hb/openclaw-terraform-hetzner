@@ -46,9 +46,9 @@ Required variables in `config/inputs.sh`:
 - `HCLOUD_TOKEN` - Hetzner Cloud API token
 - `TF_VAR_ssh_key_fingerprint` - SSH key fingerprint from Hetzner
 - `CONFIG_DIR` - Path to your openclaw-docker-config repository
-- `SERVER_IP` - Address that scripts use to SSH into the VPS. Set to `openclaw-prod` when using Tailscale (MagicDNS hostname, stable across rebuilds). Leave unset to auto-detect from Terraform output (only works when public SSH is open).
+- `SERVER_IP` - Address that scripts use to SSH into the VPS. Set to your `TF_VAR_tailscale_hostname` value (default: `openclaw-prod`) when using Tailscale (MagicDNS hostname, stable across rebuilds). Leave unset to auto-detect from Terraform output (only works when public SSH is open).
 
-> **Tailscale (optional, recommended):** Set `TF_VAR_enable_tailscale=true` and `TF_VAR_tailscale_auth_key` to install Tailscale automatically on first boot — it lets you remove SSH from the public internet entirely. See [Firewall Rules](#firewall-rules).
+> **Tailscale (optional, recommended):** Set `TF_VAR_enable_tailscale=true` and `TF_VAR_tailscale_auth_key` to install Tailscale automatically on first boot — it lets you remove SSH from the public internet entirely. Optionally set `TF_VAR_tailscale_hostname` to customize the node name (default: `openclaw-prod`). See [Firewall Rules](#firewall-rules).
 
 ### 3. Deploy Infrastructure
 
@@ -202,6 +202,8 @@ Tailscale creates a private WireGuard mesh so SSH is reachable only from devices
    ```bash
    export TF_VAR_enable_tailscale=true
    export TF_VAR_tailscale_auth_key="tskey-auth-xxxxxxxxxxxxx"
+   # Optional: customize the hostname (default: "openclaw-prod")
+   # export TF_VAR_tailscale_hostname="openclaw-staging"
    ```
 
 3. Deploy. Tailscale is installed automatically on first boot. Then verify it's working before closing public access:
@@ -216,7 +218,7 @@ Tailscale creates a private WireGuard mesh so SSH is reachable only from devices
    ```bash
    # In config/inputs.sh
    export TF_VAR_ssh_allowed_cidrs='[]'
-   export SERVER_IP="openclaw-prod"   # Tailscale MagicDNS — stable across rebuilds
+   export SERVER_IP="openclaw-prod"   # Must match TF_VAR_tailscale_hostname (default: "openclaw-prod")
    source config/inputs.sh && make plan && make apply
    ```
 
@@ -244,7 +246,7 @@ Tailscale creates a private WireGuard mesh so SSH is reachable only from devices
    >
    > `allowInsecureAuth` lets the control UI authenticate over plain HTTP — safe because it's only availale in your private tailnet.
 
-After step 5, all `make` commands (`make ssh`, `make deploy`, `make status`, etc.) connect via `openclaw-prod` on your tailnet — no IP to track down.
+After step 5, all `make` commands (`make ssh`, `make deploy`, `make status`, etc.) connect via your Tailscale hostname on your tailnet — no IP to track down.
 
 > **Recovery:** If Tailscale fails to connect, check status with `make tailscale-status`. 
 > For persistent issues, you can delete the Hetzner Cloud Firewall via the console or re-run 
@@ -385,7 +387,7 @@ sudo tailscale serve --bg 18789
 sudo tailscale serve status  # prints your HTTPS URL
 ```
 
-Dashboard is then available at `https://openclaw-prod.<tailnet>.ts.net` from any device on your tailnet — no tunnel needed.
+Dashboard is then available at `https://<tailscale-hostname>.<tailnet>.ts.net` (e.g., `https://openclaw-prod.tailnet.ts.net`) from any device on your tailnet — no tunnel needed.
 
 > **Note:** Use Serve, not Funnel. Funnel makes the service publicly accessible on the internet.
 > See [OpenClaw Tailscale gateway docs](https://docs.openclaw.ai/gateway/tailscale)
@@ -446,7 +448,7 @@ Or - as stated above - use the `SERVER_IP` variable to point `make ssh` at the T
 ```bash
 # In config/inputs.sh
 export TF_VAR_ssh_allowed_cidrs='[]'
-export SERVER_IP="openclaw-prod"   # Tailscale MagicDNS — stable across rebuilds
+export SERVER_IP="openclaw-prod"   # Must match TF_VAR_tailscale_hostname (default: "openclaw-prod")
 source config/inputs.sh && make plan && make apply
 ```
 
