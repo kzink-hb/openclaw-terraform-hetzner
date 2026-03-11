@@ -80,7 +80,7 @@ runcmd:
 
 %{ if tailscale_auth_key != "" ~}
   # Authenticate Tailscale automatically
-  - tailscale up --auth-key="${tailscale_auth_key}" --hostname="openclaw-prod"
+  - tailscale up --auth-key="${tailscale_auth_key}" --hostname="${tailscale_hostname}"
 %{ else ~}
   # Tailscale installed but not authenticated - run manually: sudo tailscale up
   - echo "[Tailscale] Auth key not provided. Run manually: sudo tailscale up"
