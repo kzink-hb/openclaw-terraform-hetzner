@@ -55,6 +55,9 @@ runcmd:
   - chmod 700 /home/${app_user}/.ssh
   - chmod 600 /home/${app_user}/.ssh/authorized_keys
 
+  # Add OpenClaw CLI shortcut
+  - echo "alias oc='cd ~/openclaw && docker compose exec openclaw-gateway openclaw'" >> /home/${app_user}/.bashrc
+
   # -----------------------------------------------------------------------------
   # Install Docker
   # -----------------------------------------------------------------------------
