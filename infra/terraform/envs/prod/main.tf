@@ -74,6 +74,7 @@ module "vps" {
     app_directory      = var.app_directory
     enable_tailscale   = var.enable_tailscale
     tailscale_auth_key = var.tailscale_auth_key
+    tailscale_hostname = var.tailscale_hostname
   })
 }
 

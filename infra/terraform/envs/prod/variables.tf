@@ -85,3 +85,9 @@ variable "tailscale_auth_key" {
   default     = ""
   sensitive   = true
 }
+
+variable "tailscale_hostname" {
+  description = "Hostname to register in Tailscale (appears in admin console and MagicDNS)"
+  type        = string
+  default     = "openclaw-prod"
+}
